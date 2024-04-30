@@ -1,103 +1,38 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Text-to-Image Cost Estimator</title>
-<style>
-    body {
-        background-image: url('background_image.jpg');
-        background-size: cover; /* Ensure the background image covers the entire viewport */
-        background-position: center; /* Center the background image */
-        font-family: Arial, sans-serif; /* Use a fallback font */
-        color: #333; /* Set text color */
-        margin: 0; /* Remove default body margin */
-        padding: 20px; /* Add some padding */
-    }
-
-    /* Style the form */
-    form {
-        background-color: rgba(255, 255, 255, 0.8); /* Add a semi-transparent white background to the form */
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 500px;
-        margin: 0 auto; /* Center the form horizontally */
-    }
-
-    /* Style form inputs */
-    input[type="text"],
-    input[type="number"],
-    textarea {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-sizing: border-box;
-    }
-
-    /* Style submit button */
-    button[type="submit"] {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    /* Style the result display */
-    #costResult {
-        margin-top: 20px;
-        text-align: center;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    
+    <!-- Link the script.js file -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <title>Cost Calculation</title>
 </head>
 <body>
-    <h1>Text-to-Image Cost Estimator</h1>
-    <form id="costEstimatorForm">
-        <label for="textInput">Text:</label>
-        <textarea id="textInput" name="text" rows="4" cols="50" required></textarea><br>
-        <label for="imageFormatInput">Image Format:</label>
-        <input type="text" id="imageFormatInput" name="imageFormat" required><br>
-        <label for="imageWidthInput">Image Width (pixels):</label>
-        <input type="number" id="imageWidthInput" name="imageWidth" required><br>
-        <label for="imageHeightInput">Image Height (pixels):</label>
-        <input type="number" id="imageHeightInput" name="imageHeight" required><br>
-        <label for="requestCountInput">Request Count:</label>
-        <input type="number" id="requestCountInput" name="requestCount" required><br>
-        <button type="submit">Estimate Cost</button>
+    <h1>Cost Calculation</h1>
+    <form action="/calculate_cost" method="post">
+        <label for="text_prompt">Text Prompt:</label>
+        <input type="text" id="text_prompt" name="text_prompt" required><br><br>
+        <label for="image_width">Image Width:</label>
+        <input type="number" id="image_width" name="image_width" required><br><br>
+        <label for="image_height">Image Height:</label>
+        <input type="number" id="image_height" name="image_height" required><br><br>
+        <label for="image_format">Image Format:</label>
+        <select id="image_format" name="image_format" required>
+            <option value="JPEG">JPEG</option>
+            <option value="PNG">PNG</option>
+            <!-- Add more options if needed -->
+        </select><br><br>
+        <button type="submit">Calculate Cost</button>
     </form>
-    <div id="costResult"></div>
 
-    <script>
-        document.getElementById('costEstimatorForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent form submission
-        
-            // Get form input values
-            var text = document.getElementById('textInput').value;
-            var imageFormat = document.getElementById('imageFormatInput').value;
-            var imageWidth = parseInt(document.getElementById('imageWidthInput').value);
-            var imageHeight = parseInt(document.getElementById('imageHeightInput').value);
-            var requestCount = parseInt(document.getElementById('requestCountInput').value);
-        
-            // Calculate image size in bytes
-            var imageSizeBytes = imageWidth * imageHeight * 3; // Assuming RGB image format
-        
-            // Convert bytes to gigabytes
-            var imageSizeGB = imageSizeBytes / (1024 * 1024 * 1024);
-        
-            // Estimate cost
-            var processingCost = 0.005 * requestCount; // $0.005 per request for processing
-            var storageCost = 1.95 * imageSizeGB; // $1.95 per GB for storage
-            var bandwidthCost = 23.40 * imageSizeGB; // $23.40 per GB for bandwidth
-        
-            var totalCost = processingCost + storageCost + bandwidthCost;
-        
-            // Display cost result
-            document.getElementById('costResult').innerHTML = '<p>Estimated total cost: $' + totalCost.toFixed(2) + '</p>';
-        });
-        
-    </script>
+    {% if scenario1_cost %}
+    <h2>Scenario 1 Cost: {{ scenario1_cost }}</h2>
+    {% endif %}
+    {% if scenario2_cost %}
+    <h2>Scenario 2 Cost: {{ scenario2_cost }}</h2>
+    {% endif %}
 </body>
 </html>
